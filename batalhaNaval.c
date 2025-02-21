@@ -1,40 +1,119 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+#define LINHAS 10
+#define COLUNAS 10
+#define HORIZONTAL 0
+#define VERTICAL 1
+
+void popularTabuleiro(int tabuleiro[LINHAS][COLUNAS]);
+int validarPosicionamento(int navio[4], int tabuleiro[LINHAS][COLUNAS]);
+int posicionarNavio(int navio[4], int tabuleiro[LINHAS][COLUNAS]);
+void desenharTabuleiro(int tabuleiro[LINHAS][COLUNAS]);
+
+
+char *msgErros[] = {
+    "Coordenadas inválidas",
+    "Tamanho do navio inválido",
+    "Posição inválida",
+};
+
+
 
 int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+    int tabuleiro[LINHAS][COLUNAS];
+    // x, y, tamanho, orientação horizontal = 0 vertical = 1
+    int navio1[4] = {0, 0, 3, HORIZONTAL}; 
+    int navio2[4] = {3, 4, 3, VERTICAL};
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
-
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
-
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
+    popularTabuleiro(tabuleiro);
+    posicionarNavio(navio1, tabuleiro);
+    posicionarNavio(navio2, tabuleiro);
+    desenharTabuleiro(tabuleiro);
     
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
-
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
-
     return 0;
 }
+
+void popularTabuleiro(int tabuleiro[LINHAS][COLUNAS]) {
+    for (int i = 0; i < LINHAS; i++)
+        for (int j = 0; j < COLUNAS; j++)
+            tabuleiro[i][j] = 0;
+}
+
+int validarPosicionamento(int navio[4], int tabuleiro[LINHAS][COLUNAS]) {
+    int x = navio[0];
+    int y = navio[1];
+    int tamanho = navio[2];
+    int orientacao = navio[3];
+    int casaOcupada;
+
+    // verifica se as coordenadas são válidas
+    if (x < 0 || x > LINHAS || y < 0 || y > COLUNAS)
+        return 1;
+
+    // verifica se o tamanho do navio é maior que o tabuleiro
+    if (tamanho > LINHAS || tamanho > COLUNAS)
+        return 2;
+
+    // verifica se o navio está fora do tabuleiro
+    if (COLUNAS - tamanho < 0 || LINHAS - tamanho < 0)
+        return 3;
+
+    // verifica se o navio está sobrepondo outro
+    for (int contador = 0; contador < tamanho; contador++) {
+        if (orientacao == HORIZONTAL)
+            casaOcupada = tabuleiro[x][y + contador];
+        else
+            casaOcupada = tabuleiro[x + contador][y];
+
+        if (casaOcupada) return 2;
+
+    }
+
+
+    return 0;
+
+}
+
+
+int posicionarNavio(int navio[4], int tabuleiro[LINHAS][COLUNAS]) {
+    int x = navio[0];
+    int y = navio[1];
+    int tamanho = navio[2];
+    int orientacao = navio[3];
+
+    int erroPosicionamento = validarPosicionamento(navio, tabuleiro);
+    if (erroPosicionamento)
+        return erroPosicionamento;
+
+    for (int contador = 0; contador < tamanho; contador++) {
+        if (orientacao == HORIZONTAL)
+            tabuleiro[x][y + contador] = tamanho;
+        else
+            tabuleiro[x + contador][y] = tamanho;
+
+    }
+
+
+    return 0;
+
+
+}
+
+void desenharTabuleiro(int tabuleiro[LINHAS][COLUNAS]) {
+    int casa;
+
+    for (int i = 0; i < LINHAS; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            casa = tabuleiro[i][j];
+            printf("%d", casa);
+            // insere um espaço como o separador entre as casas
+            if (j < COLUNAS - 1)
+                printf(" ");
+            
+        }
+
+        printf("\n");
+    }
+}
+
